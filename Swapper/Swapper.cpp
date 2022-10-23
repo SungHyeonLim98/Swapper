@@ -111,7 +111,7 @@ int Title_Menual(int x, int y)
 		gotoxy(x, y+3+max); max++; if (mum == max) { scolor(12, 0); cout << " ■"; scolor(7, 0); }
 		else cout << " □"; cout << " 게임 시작";
 		gotoxy(x, y+3+max); max++; if (mum == max) { scolor(12, 0); cout << " ■"; scolor(7, 0); }
-		else cout << " □"; cout << " 랭킹 보기";
+		else cout << " □"; cout << " 게임 방법";
 		gotoxy(x, y + 3 + max); max++; if (mum == max) { scolor(12, 0); cout << " ■"; scolor(7, 0); }
 		else cout << " □"; cout << " 게임 종료";
 		put = _getch();
@@ -297,10 +297,6 @@ void GameGuide() {
 		cout << "설명을 모두 읽으셨다면 게임시작을 위해 엔터키를 눌러주세요." << endl;
 		Sleep(75);
 		put = _getch();
-		if (put == 13)
-		{
-			Input_nickname();
-		}
 }
 
 //닉네임 입력 함수 
@@ -554,8 +550,10 @@ bool checkClear_easy(string* slide)
 }
 
 //게임 함수 - 어려움 난이도
-void Game_Hard() {
+int Game_Hard(int* score) {
 	string* slide = new string[FULLSIZE_H];
+	int move = 30;
+	int& rScore = *score;
 	int x, y;
 
 	x = 2, y = 2;
@@ -569,6 +567,9 @@ void Game_Hard() {
 
 	while (true) {
 
+		if (move == 0)
+			return Show_End_Game();
+
 		char input;
 
 		system("cls");
@@ -580,6 +581,11 @@ void Game_Hard() {
 			clearMessage();
 			break;
 		}
+
+		gotoxy(80, 5);
+		cout << move << endl;
+		gotoxy(80, 8);
+		cout << rScore << endl;
 
 		input = _getch();
 
@@ -605,6 +611,8 @@ void Game_Hard() {
 			break;
 		}
 		inputEvent_hard(slide, &x, &y);
+		move--;
+		rScore -= 33;
 	}
 }
 
@@ -721,12 +729,11 @@ int main(void)
 	CursorView(0);
 	system("title S.W.A.P.P.E.R - 스와핑 퍼즐게임!");
 	system("mode con: cols=101 lines=31");
-
-	//Title();
 	
 	while (true)
 	{
 		system("cls");
+		Title();
 
 		menualselect = Title_Menual(43, 20);
 		system("cls");
@@ -739,7 +746,6 @@ int main(void)
 		if (menualselect == 1)
 		{
 			system("cls");
-			//GameGuide(); // 게임 방법 설명 , 닉네임 입력까지 해당 함수에서 완료함(내부 호출).
 			Difficultyselect = Difficulty();
 			if (Difficultyselect == 1)
 			{
@@ -753,7 +759,11 @@ int main(void)
 			else if (Difficultyselect == 2)
 			{
 				system("cls");
-				Game_Hard();
+				if (1 == Game_Hard(&score))
+				{
+					rScore = 1000;
+					continue;
+				}
 			}
 		}
 		else if (menualselect == 2)
@@ -761,26 +771,7 @@ int main(void)
 			int input;
 
 			system("cls");
-			cout << "랭킹보기 1페이지" << endl;
-			cout << "다음페이지: 엔터키 " << endl;
-			cout << "타이틀로 돌아가기 : ESC키 " << endl;
-			while (true)
-			{
-				input = _getch();
-				
-				if (input == 13)
-				{
-					system("cls");
-					cout << "랭킹보기 2페이지" << endl;
-				}
-				else if (input == 27)
-				{
-					system("cls");
-					Title();
-					menualselect = Title_Menual(43, 20);
-					break;
-				}
-			}
+			GameGuide();
 		}
 	}
 }
